@@ -1,618 +1,439 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Phishing Website Detector</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
-:root{
-  --bg:#151515;
-  --card:#1E1E1E;
-  --card-2:#242424;
-  --border:#343434;
-  --text:#FFFFFF;
-  --muted:#A0A0A0;
-  --soft:#707070;
-
-  --green:#00E676;
-  --green-soft:#69F0AE;
-
-  --red:#FF4D4D;
-  --red-soft:#FF8A80;
-
-  --yellow:#FFB84D;
-}
-
-body{
-  background:var(--bg);
-  font-family:'Inter',sans-serif;
-  color:var(--text);
-  min-height:100vh;
-  padding:28px 20px;
-}
-
-/* ================= CONTAINER ================= */
-
-.app-container{
-  max-width:1100px;
-  margin:auto;
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:30px;
-  overflow:hidden;
-
-  box-shadow:
-  0 10px 30px rgba(0,0,0,0.35),
-  0 30px 80px rgba(0,0,0,0.45);
-}
-
-/* ================= HEADER ================= */
-
-.header-section{
-  padding:38px 32px 26px;
-  text-align:center;
-  background:#1A1A1A;
-  border-bottom:1px solid var(--border);
-}
-
-.brand{
-  display:inline-flex;
-  align-items:center;
-  gap:16px;
-  margin-bottom:14px;
-}
-
-.brand-icon{
-  width:56px;
-  height:56px;
-  padding:12px;
-  border-radius:18px;
-  background:#262626;
-  border:1px solid #3A3A3A;
-}
-
-.brand-icon svg{
-  width:100%;
-  height:100%;
-}
-
-h1{
-  font-size:2.4rem;
-  font-weight:800;
-  letter-spacing:-1px;
-  color:white;
-}
-
-.sub{
-  font-family:'JetBrains Mono',monospace;
-  font-size:.72rem;
-  letter-spacing:2px;
-  color:#8B8B8B;
-  text-transform:uppercase;
-}
-
-/* ================= MAIN ================= */
-
-.scan-panel{
-  padding:32px;
-}
-
-.input-row{
-  display:flex;
-  gap:14px;
-  flex-wrap:wrap;
-  margin-bottom:22px;
-}
-
-/* ================= INPUT ================= */
-
-.url-input{
-  flex:1;
-  min-width:250px;
-
-  height:60px;
-  padding:0 22px;
-
-  border-radius:18px;
-  border:1px solid #3A3A3A;
-
-  background:#161616;
-  color:white;
-
-  font-size:.9rem;
-  font-family:'JetBrains Mono',monospace;
-
-  outline:none;
-  transition:.2s ease;
-}
-
-.url-input::placeholder{
-  color:#777;
-}
-
-.url-input:focus{
-  border-color:#656565;
-  background:#1B1B1B;
-  box-shadow:0 0 0 4px rgba(255,255,255,.04);
-}
-
-/* ================= BUTTON ================= */
-
-.scan-button{
-  height:60px;
-  padding:0 34px;
-
-  border:none;
-  border-radius:18px;
-
-  background:white;
-  color:#111;
-
-  font-weight:800;
-  font-size:.82rem;
-  letter-spacing:1px;
-
-  cursor:pointer;
-  transition:.2s ease;
-}
-
-.scan-button:hover{
-  transform:translateY(-2px);
-  background:#ECECEC;
-}
-
-.scan-button:active{
-  transform:scale(.98);
-}
-
-/* ================= SAMPLE URLS ================= */
-
-.sample-panel{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:10px;
-}
-
-.sample-label{
-  padding:8px 14px;
-  border-radius:10px;
-
-  background:#303030;
-
-  font-size:.65rem;
-  font-weight:700;
-  letter-spacing:1px;
-  text-transform:uppercase;
-  color:#D0D0D0;
-}
-
-.sample-item{
-  padding:9px 16px;
-
-  border-radius:12px;
-  border:1px solid #383838;
-
-  background:#171717;
-  color:#EAEAEA;
-
-  font-size:.72rem;
-  font-family:'JetBrains Mono',monospace;
-
-  cursor:pointer;
-  transition:.18s ease;
-}
-
-.sample-item:hover{
-  background:#262626;
-  border-color:#555;
-  transform:translateY(-1px);
-}
-
-/* ================= LOADING ================= */
-
-.loading-state{
-  display:none;
-
-  margin:0 32px 32px;
-  padding:28px;
-
-  border-radius:24px;
-  border:1px solid var(--border);
-
-  background:#181818;
-}
-
-.loading-state.active{
-  display:block;
-  animation:fade .25s ease;
-}
-
-.progress-line{
-  width:100%;
-  height:5px;
-
-  background:#303030;
-  border-radius:100px;
-  overflow:hidden;
-
-  margin-bottom:18px;
-}
-
-.progress-line span{
-  display:block;
-  height:100%;
-  width:40%;
-
-  border-radius:100px;
-
-  background:linear-gradient(90deg,#FFFFFF,#777777);
-
-  animation:loading 1.2s infinite ease;
-}
-
-.loading-text{
-  text-align:center;
-
-  font-family:'JetBrains Mono',monospace;
-  font-size:.75rem;
-  letter-spacing:1px;
-
-  color:#B0B0B0;
-}
-
-@keyframes loading{
-  0%{
-    transform:translateX(-100%);
-  }
-  100%{
-    transform:translateX(250%);
-  }
-}
-
-@keyframes fade{
-  from{
-    opacity:0;
-    transform:translateY(6px);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
-}
-
-/* ================= RESULT PANEL ================= */
-
-.result-panel{
-  display:none;
-
-  margin:0 32px 32px;
-
-  border-radius:28px;
-  overflow:hidden;
-
-  border:1px solid var(--border);
-
-  background:#191919;
-}
-
-.result-panel.active{
-  display:block;
-  animation:resultAnim .3s ease;
-}
-
-@keyframes resultAnim{
-  from{
-    opacity:0;
-    transform:translateY(10px);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
-}
-
-/* ================= VERDICT ================= */
-
-.verdict-area{
-  padding:30px 32px;
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  flex-wrap:wrap;
-  gap:18px;
-
-  border-bottom:1px solid var(--border);
-}
-
-.verdict-badge{
-  display:flex;
-  align-items:center;
-  gap:16px;
-}
-
-.verdict-icon-svg{
-  width:52px;
-  height:52px;
-
-  padding:10px;
-
-  border-radius:16px;
-
-  background:#262626;
-  border:1px solid #3A3A3A;
-}
-
-.verdict-title{
-  font-size:1.8rem;
-  font-weight:800;
-  letter-spacing:-.5px;
-}
-
-.verdict-url{
-  margin-top:10px;
-
-  display:inline-block;
-
-  padding:8px 14px;
-
-  border-radius:12px;
-
-  background:#252525;
-  color:#D2D2D2;
-
-  font-size:.72rem;
-  font-family:'JetBrains Mono',monospace;
-
-  word-break:break-all;
-}
-
-/* ================= CONFIDENCE ================= */
-
-.confidence-metric{
-  min-width:130px;
-
-  padding:14px 20px;
-
-  border-radius:18px;
-
-  background:#242424;
-  border:1px solid #363636;
-}
-
-.confidence-number{
-  font-size:2rem;
-  font-weight:800;
-  line-height:1;
-
-  font-family:'JetBrains Mono',monospace;
-}
-
-.confidence-label{
-  margin-top:6px;
-
-  font-size:.62rem;
-  letter-spacing:1.5px;
-  text-transform:uppercase;
-
-  color:#A9A9A9;
-}
-
-/* ================= RISK ================= */
-
-.risk-block{
-  padding:26px 32px;
-  border-bottom:1px solid var(--border);
-}
-
-.risk-header{
-  margin-bottom:14px;
-
-  font-size:.72rem;
-  font-weight:700;
-  letter-spacing:1.5px;
-  text-transform:uppercase;
-
-  color:#D0D0D0;
-}
-
-.bar-background{
-  height:10px;
-
-  overflow:hidden;
-
-  background:#303030;
-  border-radius:999px;
-}
-
-.risk-fill{
-  width:0%;
-  height:100%;
-
-  border-radius:999px;
-  transition:width .7s ease;
-}
-
-/* ================= FEATURES ================= */
-
-.features-container{
-  padding:32px;
-}
-
-.features-header{
-  margin-bottom:18px;
-
-  font-size:.72rem;
-  font-weight:700;
-  letter-spacing:1.5px;
-  text-transform:uppercase;
-
-  color:#C8C8C8;
-}
-
-.feature-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
-  gap:14px;
-}
-
-.feature-tile{
-  display:flex;
-  align-items:center;
-  gap:12px;
-
-  padding:16px;
-
-  border-radius:18px;
-  border:1px solid #313131;
-
-  background:#151515;
-
-  transition:.18s ease;
-}
-
-.feature-tile:hover{
-  transform:translateY(-2px);
-  background:#1B1B1B;
-  border-color:#474747;
-}
-
-.indicator-dot{
-  width:10px;
-  height:10px;
-
-  border-radius:50%;
-  flex-shrink:0;
-}
-
-.feature-name{
-  flex:1;
-
-  font-size:.82rem;
-  font-weight:500;
-}
-
-.feature-risk-badge{
-  font-size:.7rem;
-  font-weight:700;
-  font-family:'JetBrains Mono',monospace;
-}
-
-/* ================= ERROR ================= */
-
-.error-message{
-  display:none;
-
-  margin-top:18px;
-  padding:16px 18px;
-
-  border-radius:18px;
-
-  background:#2A1717;
-  border:1px solid #5A2A2A;
-
-  color:#FF7B7B;
-
-  font-size:.76rem;
-  font-family:'JetBrains Mono',monospace;
-}
-
-.error-message.active{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.error-message span:first-child{
-  color:#FF4444;
-  font-size:1rem;
-  font-weight:bold;
-}
-
-/* ================= FOOTER ================= */
-
-footer{
-  padding:20px;
-  text-align:center;
-
-  border-top:1px solid var(--border);
-
-  background:#171717;
-
-  color:#7E7E7E;
-
-  font-size:.68rem;
-  letter-spacing:.5px;
-}
-
-/* ================= MOBILE ================= */
-
-@media(max-width:700px){
-
-  body{
-    padding:14px;
-  }
-
-  .header-section,
-  .scan-panel,
-  .features-container,
-  .risk-block,
-  .verdict-area{
-    padding-left:18px;
-    padding-right:18px;
-  }
-
-  h1{
-    font-size:1.8rem;
-  }
-
-  .result-panel,
-  .loading-state{
-    margin-left:18px;
-    margin-right:18px;
-  }
-
-  .verdict-area{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  .confidence-metric{
-    align-self:flex-start;
-  }
-
-  .feature-grid{
-    grid-template-columns:1fr;
-  }
-
-  .scan-button{
-    width:100%;
-  }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>PhishGuard · AI Detector</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0D0D0D;
+      --card: #181818;
+      --card-2: #222;
+      --border: #2E2E2E;
+      --text: #FFFFFF;
+      --muted: #A8A8A8;
+      --soft: #7A7A7A;
+      --green: #00E676;
+      --green-soft: #69F0AE;
+      --red: #FF4D4D;
+      --red-soft: #FF8A80;
+      --yellow: #FFB84D;
+      --glow: rgba(0, 230, 118, 0.08);
+    }
+    body {
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      padding: 30px 20px;
+      background-image: radial-gradient(circle at 10% 20%, #1a1a1a 0%, #0a0a0a 100%);
+    }
+    .app-container {
+      max-width: 1120px;
+      margin: auto;
+      background: rgba(24, 24, 24, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 42px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.02);
+    }
+    .header-section {
+      padding: 42px 32px 28px;
+      text-align: center;
+      background: rgba(20, 20, 20, 0.5);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      position: relative;
+    }
+    .header-section::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 20%; right: 20%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0, 230, 118, 0.2), transparent);
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 10px;
+    }
+    .brand-icon {
+      width: 60px;
+      height: 60px;
+      padding: 12px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+    .brand-icon svg { width: 100%; height: 100%; display: block; }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #f0f0f0 0%, #b0b0b0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .7rem;
+      letter-spacing: 3px;
+      color: #6B6B6B;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .scan-panel {
+      padding: 36px 32px 24px;
+    }
+    .input-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .url-input {
+      flex: 1;
+      min-width: 240px;
+      height: 64px;
+      padding: 0 26px;
+      border-radius: 24px;
+      border: 1px solid #333;
+      background: #0F0F0F;
+      color: #f0f0f0;
+      font-size: .9rem;
+      font-family: 'JetBrains Mono', monospace;
+      outline: none;
+      transition: all .2s;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.4);
+    }
+    .url-input::placeholder { color: #5A5A5A; }
+    .url-input:focus {
+      border-color: #5A5A5A;
+      background: #141414;
+      box-shadow: 0 0 0 4px rgba(0, 230, 118, 0.06), inset 0 2px 6px rgba(0,0,0,0.5);
+    }
+    .scan-button {
+      height: 64px;
+      padding: 0 42px;
+      border: none;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+      color: #0B0B0B;
+      font-weight: 800;
+      font-size: .8rem;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      transition: all .2s;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    }
+    .scan-button:hover {
+      transform: translateY(-2px) scale(1.01);
+      background: linear-gradient(135deg, #fafafa 0%, #d4d4d4 100%);
+      box-shadow: 0 8px 24px rgba(0, 230, 118, 0.08);
+    }
+    .scan-button:active { transform: scale(.97); }
+    .sample-panel {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+    .sample-label {
+      padding: 8px 18px;
+      border-radius: 40px;
+      background: #262626;
+      font-size: .6rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #B0B0B0;
+      border: 1px solid #3A3A3A;
+    }
+    .sample-item {
+      padding: 10px 20px;
+      border-radius: 40px;
+      border: 1px solid #333;
+      background: #111;
+      color: #ddd;
+      font-size: .7rem;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+      transition: all .15s;
+      backdrop-filter: blur(4px);
+    }
+    .sample-item:hover {
+      background: #242424;
+      border-color: #5A5A5A;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .loading-state {
+      display: none;
+      margin: 0 32px 32px;
+      padding: 32px 28px;
+      border-radius: 28px;
+      border: 1px solid #2A2A2A;
+      background: #121212;
+      backdrop-filter: blur(4px);
+    }
+    .loading-state.active {
+      display: block;
+      animation: fade .3s ease;
+    }
+    .progress-line {
+      width: 100%;
+      height: 6px;
+      background: #2A2A2A;
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+    .progress-line span {
+      display: block;
+      height: 100%;
+      width: 30%;
+      border-radius: 100px;
+      background: linear-gradient(90deg, #00E676, #69F0AE, #00E676);
+      background-size: 200% 100%;
+      animation: loading 1.6s infinite ease;
+    }
+    .loading-text {
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .7rem;
+      letter-spacing: 1px;
+      color: #9A9A9A;
+    }
+    @keyframes loading {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(300%); }
+    }
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .result-panel {
+      display: none;
+      margin: 0 32px 32px;
+      border-radius: 32px;
+      overflow: hidden;
+      border: 1px solid #2A2A2A;
+      background: #121212;
+      backdrop-filter: blur(4px);
+    }
+    .result-panel.active { display: block; animation: resultAnim .35s ease; }
+    @keyframes resultAnim {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .verdict-area {
+      padding: 32px 32px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 18px;
+      border-bottom: 1px solid #2A2A2A;
+      background: #161616;
+    }
+    .verdict-badge {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .verdict-icon-svg {
+      width: 58px;
+      height: 58px;
+      padding: 10px;
+      border-radius: 20px;
+      background: #1E1E1E;
+      border: 1px solid #3A3A3A;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    }
+    .verdict-title {
+      font-size: 1.9rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .verdict-url {
+      margin-top: 8px;
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 40px;
+      background: #1A1A1A;
+      color: #C0C0C0;
+      font-size: .7rem;
+      font-family: 'JetBrains Mono', monospace;
+      word-break: break-all;
+      border: 1px solid #2E2E2E;
+    }
+    .confidence-metric {
+      min-width: 130px;
+      padding: 14px 22px;
+      border-radius: 24px;
+      background: #1A1A1A;
+      border: 1px solid #363636;
+      backdrop-filter: blur(4px);
+      text-align: center;
+    }
+    .confidence-number {
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .confidence-label {
+      margin-top: 6px;
+      font-size: .6rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #A9A9A9;
+    }
+    .risk-block {
+      padding: 28px 32px;
+      border-bottom: 1px solid #2A2A2A;
+      background: #111;
+    }
+    .risk-header {
+      margin-bottom: 16px;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #C8C8C8;
+    }
+    .bar-background {
+      height: 10px;
+      overflow: hidden;
+      background: #282828;
+      border-radius: 100px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .risk-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: 100px;
+      transition: width .7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .features-container {
+      padding: 32px;
+      background: #0F0F0F;
+    }
+    .features-header {
+      margin-bottom: 20px;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #B8B8B8;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 14px;
+    }
+    .feature-tile {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 20px;
+      border-radius: 24px;
+      border: 1px solid #2A2A2A;
+      background: #141414;
+      transition: all .18s;
+      backdrop-filter: blur(4px);
+    }
+    .feature-tile:hover {
+      transform: translateY(-3px);
+      background: #1C1C1C;
+      border-color: #444;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    .indicator-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 6px rgba(255,255,255,0.05);
+    }
+    .feature-name {
+      flex: 1;
+      font-size: .8rem;
+      font-weight: 500;
+      color: #E8E8E8;
+    }
+    .feature-risk-badge {
+      font-size: .7rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.3px;
+    }
+    .error-message {
+      display: none;
+      margin-top: 20px;
+      padding: 16px 22px;
+      border-radius: 24px;
+      background: #1F1111;
+      border: 1px solid #5A2A2A;
+      color: #FF7B7B;
+      font-size: .8rem;
+      font-family: 'JetBrains Mono', monospace;
+      backdrop-filter: blur(4px);
+    }
+    .error-message.active {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .error-message span:first-child {
+      color: #FF4444;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+    footer {
+      padding: 22px;
+      text-align: center;
+      border-top: 1px solid #222;
+      background: #0E0E0E;
+      color: #6A6A6A;
+      font-size: .7rem;
+      letter-spacing: 0.8px;
+    }
+    @media(max-width:700px) {
+      body { padding: 12px; }
+      .header-section, .scan-panel, .features-container, .risk-block, .verdict-area {
+        padding-left: 18px; padding-right: 18px;
+      }
+      h1 { font-size: 1.8rem; }
+      .result-panel, .loading-state { margin-left: 18px; margin-right: 18px; }
+      .verdict-area { flex-direction: column; align-items: flex-start; }
+      .confidence-metric { align-self: flex-start; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .scan-button { width: 100%; }
+      .brand-icon { width: 48px; height: 48px; padding: 10px; }
+    }
+  </style>
 </head>
 <body>
 <div class="app-container">
   <div class="header-section">
     <div class="brand">
       <div class="brand-icon">
-        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M24 6L8 14V24C8 34 16 42 24 44C32 42 40 34 40 24V14L24 6Z" fill="#2C2C2C" stroke="#FFFFFF" stroke-width="1.8"/>
-          <path d="M20 24L24 28L32 18" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="30" cy="18" r="2" fill="#FFFFFF"/>
+        <svg viewBox="0 0 48 48" fill="none">
+          <path d="M24 6L8 14V24C8 34 16 42 24 44C32 42 40 34 40 24V14L24 6Z" fill="#1E1E1E" stroke="#E0E0E0" stroke-width="1.6"/>
+          <path d="M20 24L24 28L32 18" stroke="#00E676" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="30" cy="18" r="2" fill="#00E676"/>
         </svg>
       </div>
-      <h1>Phishing Website Detector</h1>
+      <h1>PhishGuard</h1>
     </div>
-    <div class="sub">AI BASED URL ANALYZER</div>
+    <div class="sub">AI · BEHAVIORAL URL ANALYZER</div>
   </div>
 
   <div class="scan-panel">
@@ -625,7 +446,7 @@ footer{
       <span class="sample-item" onclick="setTestUrl('https://github.com')">github.com</span>
       <span class="sample-item" onclick="setTestUrl('https://google.com')">google.com</span>
       <span class="sample-item" onclick="setTestUrl('http://secure-paypal-verify.tk/login?redirect=webapps')">suspicious-paypal</span>
-      <span class="sample-item" onclick="setTestUrl('http://192.168.12.45/banking/update.php')">ip-based address</span>
+      <span class="sample-item" onclick="setTestUrl('http://192.168.12.45/banking/update.php')">ip-based</span>
     </div>
     <div class="error-message" id="globalError">
       <span>!</span> <span id="errorText"></span>
@@ -634,16 +455,16 @@ footer{
 
   <div class="loading-state" id="loadingIndicator">
     <div class="progress-line"><span></span></div>
-    <div class="loading-text">EXTRACTING FEATURES · EVALUATING 15 INDICATORS</div>
+    <div class="loading-text">EXTRACTING 15 BEHAVIORAL INDICATORS</div>
   </div>
 
   <div class="result-panel" id="resultContainer">
     <div class="verdict-area" id="verdictHeader">
       <div class="verdict-badge">
         <div class="verdict-icon-svg" id="dynamicIcon">
-          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M24 6L8 14V24C8 34 16 42 24 44C32 42 40 34 40 24V14L24 6Z" fill="#2C2C2C" stroke="#FFFFFF" stroke-width="1.4"/>
-            <path d="M20 24L24 28L32 18" stroke="#FFFFFF" stroke-width="2.2"/>
+          <svg viewBox="0 0 48 48" fill="none">
+            <path d="M24 6L8 14V24C8 34 16 42 24 44C32 42 40 34 40 24V14L24 6Z" fill="#1E1E1E" stroke="#E0E0E0" stroke-width="1.4"/>
+            <path d="M20 24L24 28L32 18" stroke="#E0E0E0" stroke-width="2.2"/>
           </svg>
         </div>
         <div>
@@ -653,26 +474,24 @@ footer{
       </div>
       <div class="confidence-metric">
         <div class="confidence-number" id="confidenceValue">0%</div>
-        <div class="confidence-label">CONFIDENCE SCORE</div>
+        <div class="confidence-label">CONFIDENCE</div>
       </div>
     </div>
 
     <div class="risk-block">
-      <div class="risk-header">RISK ASSESSMENT METER</div>
+      <div class="risk-header">RISK METER</div>
       <div class="bar-background">
         <div class="risk-fill" id="riskFillBar"></div>
       </div>
     </div>
 
     <div class="features-container">
-      <div class="features-header">15 SECURITY FEATURES · BEHAVIORAL ANALYSIS</div>
+      <div class="features-header">15 SECURITY FEATURES · DETAILED ANALYSIS</div>
       <div class="feature-grid" id="featuresList"></div>
     </div>
   </div>
 
-  <footer>
-    AI Based Phishing Website Detector
-  </footer>
+  <footer>AI Powered Phishing Detection · Zero‑Log</footer>
 </div>
 
 <script>
@@ -682,7 +501,6 @@ footer{
     urlInput.focus();
   }
 
-  // Core feature extraction & risk engine (deterministic, informative)
   function extractFeaturesAndPredict(url) {
     if (!url) return null;
     let urlRaw = url.trim();
@@ -712,7 +530,7 @@ footer{
     const featuresArray = [
       { name: "HTTPS encryption", status: hasHttps ? "safe" : "warning", weight: hasHttps ? -0.09 : 0.18 },
       { name: "@ symbol anomaly", status: hasAtSymbol ? "danger" : "safe", weight: hasAtSymbol ? 0.29 : -0.04 },
-      { name: "Double-slash redirect pattern", status: extraSlashAfterHost ? "danger" : "safe", weight: extraSlashAfterHost ? 0.22 : 0 },
+      { name: "Double-slash redirect", status: extraSlashAfterHost ? "danger" : "safe", weight: extraSlashAfterHost ? 0.22 : 0 },
       { name: "IP address as hostname", status: ipAddressPresent ? "danger" : "safe", weight: ipAddressPresent ? 0.34 : -0.06 },
       { name: "Suspicious top-level domain", status: riskyTld ? "danger" : "safe", weight: riskyTld ? 0.30 : -0.02 },
       { name: "Excessive URL length", status: longUrl ? "warning" : "safe", weight: longUrl ? 0.13 : -0.01 },
@@ -728,34 +546,26 @@ footer{
     ];
     
     let rawScore = 18.0;
-    for (let f of featuresArray) {
-      rawScore += f.weight * 68;
-    }
+    for (let f of featuresArray) rawScore += f.weight * 68;
     let riskScore = Math.min(99, Math.max(1, Math.round(rawScore)));
     const isPhishing = riskScore >= 36;
     let confidence = isPhishing ? 63 + Math.round((riskScore - 36) * 0.65) : 62 + Math.round((36 - riskScore) * 0.65);
     confidence = Math.min(97, Math.max(60, confidence));
-    
     const finalLabel = isPhishing ? "PHISHING DETECTED" : "LEGITIMATE / SAFE";
     
     const enrichedFeatures = featuresArray.map(f => {
-      let finalStatusLabel = "";
-      let statusClass = "";
+      let finalStatusLabel = "", statusClass = "";
       if (f.status === "safe") { finalStatusLabel = "SAFE"; statusClass = "safe"; }
       else if (f.status === "warning") { finalStatusLabel = "NEUTRAL"; statusClass = "warning"; }
       else if (f.status === "danger") { finalStatusLabel = "RISKY"; statusClass = "danger"; }
       else { finalStatusLabel = "NEUTRAL"; statusClass = "neutral"; }
-      return {
-        name: f.name,
-        statusClass: statusClass,
-        displayStatus: finalStatusLabel
-      };
+      return { name: f.name, statusClass, displayStatus: finalStatusLabel };
     });
     
     return {
-      isPhishing: isPhishing,
+      isPhishing,
       verdictLabel: finalLabel,
-      riskScore: riskScore,
+      riskScore,
       confidencePercent: confidence,
       analyzedUrl: urlRaw,
       features: enrichedFeatures
@@ -782,9 +592,7 @@ footer{
     }
     
     let finalUrl = rawUrl;
-    if (!/^https?:\/\//i.test(finalUrl)) {
-      finalUrl = "http://" + finalUrl;
-    }
+    if (!/^https?:\/\//i.test(finalUrl)) finalUrl = "http://" + finalUrl;
     
     analyzeBtn.disabled = true;
     loadingDiv.classList.add('active');
@@ -804,7 +612,7 @@ footer{
       } finally {
         analyzeBtn.disabled = false;
       }
-    }, 360);
+    }, 380);
   }
   
   function renderResults(data) {
@@ -818,54 +626,42 @@ footer{
     const dynamicIconSvg = document.getElementById('dynamicIcon');
     
     if (isPhish) {
-      // PHISHING - BRIGHT RED ACCENTS
-      verdictHeader.style.background = "#2A1515";
-      verdictLabelSpan.style.color = "#FF4444";
-      verdictLabelSpan.style.textShadow = "0 0 4px rgba(255,68,68,0.3)";
-      confidenceSpan.style.color = "#FF6666";
-      riskFillBar.style.background = "linear-gradient(90deg, #FF4444, #CC0000)";
-      riskFillBar.style.boxShadow = "0 0 6px rgba(255,68,68,0.5)";
-      dynamicIconSvg.innerHTML = `<svg viewBox="0 0 48 48" fill="none"><path d="M24 6L8 14V24C8 34 16 42 24 44C32 42 40 34 40 24V14L24 6Z" fill="#2C2C2C" stroke="#FF4444" stroke-width="1.8"/><path d="M20 20L28 28M28 20L20 28" stroke="#FF6666" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+      verdictHeader.style.background = "rgba(42, 18, 18, 0.8)";
+      verdictLabelSpan.style.color = "#FF5555";
+      verdictLabelSpan.style.textShadow = "0 0 12px rgba(255,68,68,0.25)";
+      confidenceSpan.style.color = "#FF7777";
+      riskFillBar.style.background = "linear-gradient(90deg, #FF4D4D, #CC0000)";
+      riskFillBar.style.boxShadow = "0 0 16px rgba(255,68,68,0.3)";
+      dynamicIconSvg.innerHTML = `<svg viewBox="0 0 48 48" fill="none"><path d="M24 6L8 14V24C8 34 16 42 24 44C32 42 40 34 40 24V14L24 6Z" fill="#1E1E1E" stroke="#FF5555" stroke-width="1.8"/><path d="M20 20L28 28M28 20L20 28" stroke="#FF8888" stroke-width="2.5" stroke-linecap="round"/></svg>`;
     } else {
-      // LEGITIMATE - BRIGHT GREEN ACCENTS
-      verdictHeader.style.background = "#152A15";
+      verdictHeader.style.background = "rgba(18, 42, 18, 0.8)";
       verdictLabelSpan.style.color = "#00E676";
-      verdictLabelSpan.style.textShadow = "0 0 4px rgba(0,230,118,0.3)";
+      verdictLabelSpan.style.textShadow = "0 0 12px rgba(0,230,118,0.2)";
       confidenceSpan.style.color = "#69F0AE";
       riskFillBar.style.background = "linear-gradient(90deg, #00E676, #00B248)";
-      riskFillBar.style.boxShadow = "0 0 6px rgba(0,230,118,0.4)";
-      dynamicIconSvg.innerHTML = `<svg viewBox="0 0 48 48" fill="none"><path d="M24 6L8 14V24C8 34 16 42 24 44C32 42 40 34 40 24V14L24 6Z" fill="#2C2C2C" stroke="#00E676" stroke-width="1.8"/><path d="M18 24L24 30L34 18" stroke="#69F0AE" stroke-width="2.5" stroke-linecap="round"/></svg>`;
+      riskFillBar.style.boxShadow = "0 0 16px rgba(0,230,118,0.25)";
+      dynamicIconSvg.innerHTML = `<svg viewBox="0 0 48 48" fill="none"><path d="M24 6L8 14V24C8 34 16 42 24 44C32 42 40 34 40 24V14L24 6Z" fill="#1E1E1E" stroke="#00E676" stroke-width="1.8"/><path d="M18 24L24 30L34 18" stroke="#69F0AE" stroke-width="2.8" stroke-linecap="round"/></svg>`;
     }
     
     verdictLabelSpan.innerText = data.verdictLabel;
     let shortUrl = data.analyzedUrl.length > 68 ? data.analyzedUrl.substring(0, 65) + "…" : data.analyzedUrl;
     verdictUrlSpan.innerText = shortUrl;
     confidenceSpan.innerText = data.confidencePercent + "%";
-    setTimeout(() => {
-      riskFillBar.style.width = data.riskScore + "%";
-    }, 20);
+    setTimeout(() => { riskFillBar.style.width = data.riskScore + "%"; }, 20);
     
     featuresGrid.innerHTML = "";
     for (let feat of data.features) {
       const tile = document.createElement('div');
       tile.className = 'feature-tile';
-      let dotColor = "#9A9A9A";
-      let badgeColor = "#CCCCCC";
-      if (feat.statusClass === "safe") { 
-        dotColor = "#00E676"; 
-        badgeColor = "#69F0AE"; 
-      } else if (feat.statusClass === "warning") { 
-        dotColor = "#FFB74D"; 
-        badgeColor = "#FFD54F"; 
-      } else if (feat.statusClass === "danger") { 
-        dotColor = "#FF4444"; 
-        badgeColor = "#FF8A80"; 
-      }
+      let dotColor = "#9A9A9A", badgeColor = "#CCCCCC";
+      if (feat.statusClass === "safe") { dotColor = "#00E676"; badgeColor = "#69F0AE"; } 
+      else if (feat.statusClass === "warning") { dotColor = "#FFB74D"; badgeColor = "#FFD54F"; } 
+      else if (feat.statusClass === "danger") { dotColor = "#FF4444"; badgeColor = "#FF8A80"; }
       
       const dotSpan = document.createElement('div');
       dotSpan.className = 'indicator-dot';
       dotSpan.style.backgroundColor = dotColor;
-      dotSpan.style.boxShadow = feat.statusClass === "danger" ? "0 0 4px rgba(255,68,68,0.5)" : (feat.statusClass === "safe" ? "0 0 4px rgba(0,230,118,0.4)" : "none");
+      dotSpan.style.boxShadow = feat.statusClass === "danger" ? "0 0 10px rgba(255,68,68,0.3)" : (feat.statusClass === "safe" ? "0 0 10px rgba(0,230,118,0.25)" : "none");
       const nameSpan = document.createElement('div');
       nameSpan.className = 'feature-name';
       nameSpan.innerText = feat.name;
@@ -885,7 +681,6 @@ footer{
   document.getElementById('targetUrl').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') runAnalysis();
   });
-  
 </script>
 </body>
 </html>
